@@ -1,12 +1,21 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Gif, SearchResponse } from '../interfaces/gifs.interfaces';
 
 @Injectable({providedIn: 'root'})
 export class GifsService {
 
+  public gifList: Gif[] = [];
+
   private _tagsHistory: string[] = [];
+  private apiKey: string = '1eORVcsh2KLMTDSKz8vG4qM8k5bqZ1BP';
+  private serviceUrl: string = 'http://api.giphy.com/v1/gifs';
 
 
-  constructor() { }
+  constructor(private http: HttpClient) {
+    this.loadLocalStorage();
+    this.searchTag(this._tagsHistory[0])
+   }
 
 
   get tagsHistory(){
@@ -24,13 +33,41 @@ export class GifsService {
 
       this._tagsHistory = this._tagsHistory.splice(0, 10); // esto limita el array a 10 tags.
 
-
+      this.saveLocalStorage();
   }
+
+  private saveLocalStorage():void{
+    localStorage.setItem('history', JSON.stringify(this._tagsHistory));
+  }
+
+  private loadLocalStorage():void {
+    if(!localStorage.getItem('history')) return;
+
+    this._tagsHistory=JSON.parse(localStorage.getItem('history')!); //con la exclamación le decimos que siempre va a venir algo.
+  }
+
 
 
   searchTag( tag:string): void{
     if(tag.length === 0) return;
 
     this.organizeHistory(tag);
+
+    // fetch('http://api.giphy.com/v1/gifs/search?api_key=1eORVcsh2KLMTDSKz8vG4qM8k5bqZ1BP&q=sakura&limit=10')
+    //   .then(resp => resp.json())
+    //   .then(data => console.log(data))
+
+    const params = new HttpParams()
+      .set('api_key', this.apiKey)
+      .set('limit', '10')
+      .set('q', tag)
+
+    this.http.get<SearchResponse>(`${this.serviceUrl}/search`, {params: params})
+    .subscribe(resp => {
+
+      this.gifList = resp.data;
+
+
+    });
   }
 }
