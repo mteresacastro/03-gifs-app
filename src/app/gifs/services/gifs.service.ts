@@ -14,7 +14,7 @@ export class GifsService {
 
   constructor(private http: HttpClient) {
     this.loadLocalStorage();
-    this.searchTag(this._tagsHistory[0])
+    console.log('Gifs Service Ready');
    }
 
 
@@ -44,6 +44,9 @@ export class GifsService {
     if(!localStorage.getItem('history')) return;
 
     this._tagsHistory=JSON.parse(localStorage.getItem('history')!); //con la exclamación le decimos que siempre va a venir algo.
+
+    if(this._tagsHistory.length === 0) return;
+    this.searchTag(this._tagsHistory[0] );
   }
 
 
@@ -66,8 +69,6 @@ export class GifsService {
     .subscribe(resp => {
 
       this.gifList = resp.data;
-
-
     });
   }
 }
