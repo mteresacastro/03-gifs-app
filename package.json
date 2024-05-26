@@ -8,6 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
+  "homepage": "https://mteresacastro.github.io/03-gifs-app/",
   "private": true,
   "dependencies": {
     "@angular/animations": "^17.3.0",
